@@ -1,0 +1,99 @@
+
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/paper-button/paper-button.html">
+<link rel="import" href="../../bower_components/paper-input/paper-input.html">
+
+<dom-module id="menu-input">
+
+  <template>
+
+    <style>
+      :host {
+        display: block;
+      }
+
+      .input-wrapper {
+        /*padding-left: 70px;*/
+      }
+
+      paper-input {
+        display: inline-block;
+        width: 65%;
+        --paper-input-container: {
+          padding-bottom: 0;
+        };
+
+        /* These styles are not DRY :( */
+        --paper-input-container-label: {
+          font-size: 20px;
+          font-family: 'Roboto Slab', 'Roboto', 'Helvetica', 'Arial', sans-serif;
+          font-weight: normal;
+          color: #9E9E9E;
+        };
+        --paper-input-container-input: {
+          font-size: 20px;
+          font-family: 'Roboto Slab', 'Roboto', 'Helvetica', 'Arial', sans-serif;
+        };
+        --paper-input-container-underline: {
+          top: 7px;
+          background: #9E9E9E;
+        };
+        --paper-input-container-underline-focus: {
+          top: 7px;
+        };
+      }
+
+      paper-input[focused] + paper-button,
+      paper-button[focused] {
+        background: var(--default-primary-color);
+        color: var(--text-primary-color);
+      }
+
+      paper-button {
+        background: #E0E0E0;
+        color: #9E9E9E;
+        font-size: 14px;
+      }
+
+      paper-button[focused] {
+        /* https://github.com/PolymerElements/paper-button/pull/43 */
+        outline-width: 3px;
+      }
+    </style>
+
+    <div class="input-wrapper">
+
+      <paper-input id="menuInput"
+                   no-label-float
+                   label="Add a Menu Item"
+                   on-keydown="_checkAdd">
+      </paper-input>
+
+      <paper-button on-tap="_add">Add</paper-button>
+
+    </div>
+
+  </template>
+
+</dom-module>
+<script>
+  Polymer({
+
+    is: 'menu-input',
+
+    // Listen for ENTER key
+    _checkAdd: function(e) {
+      if (e.keyCode === 13) {
+        this._add();
+      }
+    },
+
+    _add: function() {
+      if (this.$.menuInput.value) {
+        this.fire('add-menu', {value: this.$.menuInput.value});
+        this.$.menuInput.value = null;
+      }
+    }
+
+  });
+</script>

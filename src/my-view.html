@@ -1,0 +1,134 @@
+<link rel="import" href="../bower_components/polymer/polymer.html">
+<link rel="import" href="../bower_components/iron-flex-layout/iron-flex-layout-classes.html">
+
+<link rel="import" href="shared-styles.html">
+<link rel="import" href="level-element.html">
+<link rel="import" href="code-input/code-input.html">
+
+
+<dom-module id="my-view">
+    <template>
+        <style include="shared-styles iron-flex iron-flex-alignment">
+            :host {
+                display: block;
+                padding: 10px;
+                white-space: nowrap;
+            }
+
+        </style>
+
+        <div class="card layout horizontal center" id="playg" style="overflow-x: scroll;display: block;">
+
+            <code-input init_code="{{menu.code}}" ></code-input>
+
+
+            <!--<template is="dom-repeat" items="{{levels}}" as="level">-->
+
+            <level-element on-add-next="addLevel" menu="{{menu.menus}}" level="{{level}}"></level-element>
+
+            <!--</template>-->
+
+
+        </div>
+    </template>
+
+    <script>
+        Polymer({
+            is: 'my-view',
+            properties: {
+
+                menu: {
+                    type: Object,
+                    notify:true,
+                    value: {
+                        "code": "*100#",
+                        "description": "Selfcare:",
+                        "level": 1,
+                        "sublevel": 1,
+                        "menus": [
+
+                        ]
+                    }
+                },
+
+                levels: {
+                    type: Array,
+                    value: []
+                },
+                code: {
+                    type: String,
+                    value: '8080'
+                },
+                inputCode: {
+                    type: Boolean,
+                    value: true
+                }
+            },
+
+            listeners: {
+                //'codeInput.click': '_inputBlur'
+                //'codeInput.click': '_inputBlur'
+            },
+
+            _inputBlur: function () {
+                this._toggleCode();
+            },
+            _toggleCode: function () {
+                this.inputCode = !this.inputCode;
+            },
+
+
+/*
+            addLevelFromLevel: function (evt) {
+                console.info("Add level from level");
+                //el = this;
+
+                var next = evt.target.nextElementSibling;
+
+                if(!next){
+                    next = document.createElement('level-element');
+                    console.log(this.$.playg);
+                    next.addEventListener('add-next',this.addLevel);
+                    console.log(this);
+                    this.$.playg.appendChild(next);
+                }
+
+                next.menu = evt.detail.selection.menu.menus;
+
+
+            },
+            */
+            addLevel: function (evt) {
+                //console.info("Add Level");
+                var myView = document.querySelector('my-view');
+
+                var next = evt.target.nextElementSibling;
+
+                if(!next){
+                    next = document.createElement('level-element');
+                    //console.log(myView.$.playg);
+
+                    next.addEventListener('add-next',myView.addLevel);
+
+
+                    myView.$.playg.appendChild(next);
+                }
+
+                next.menu = evt.detail.selection.menu.menus;
+
+
+                if(next.menu.length){
+                    console.log("There are more to render");
+                }else {
+                    console.log("No more to render");
+                    while (next.nextElementSibling){
+                        next.nextElementSibling.remove()
+                    }
+
+                }
+
+            }
+
+        });
+    </script>
+</dom-module>

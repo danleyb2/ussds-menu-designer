@@ -1,0 +1,98 @@
+<link rel="import" href="../menu-item/menu-item.html">
+<link rel="import" href="../../bower_components/iron-selector/iron-selector.html">
+
+<dom-module id="menu-list">
+
+  <template>
+
+    <style>
+      :host {
+        display: block;
+      }
+
+      .no-more-msg {
+        min-height: 40px;
+        font-family: 'Roboto Slab';
+        font-size: 20px;
+        color: #BDBDBD;
+        cursor: default;
+        padding-left: 67px;
+        -webkit-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
+      }
+
+      menu-item:first-of-type {
+        margin-top: 0;
+      }
+
+      menu-item {
+        margin: 16px 0;
+      }
+
+      .iron-selected {
+        background: #7bee9d;
+      }
+    </style>
+
+    <p class="no-more-msg" hidden="[[_menusEmpty(menus.length)]]">No Menus at this Level! </p>
+
+    <iron-selector id="selector" selected="0" on-iron-select="_itemSelected">
+    <template is="dom-repeat"
+              items="{{menus}}"
+              as="menu"
+              filter="{{_computeFilter(filterBy)}}"
+              observe="isComplete">
+      <menu-item menu="{{menu}}"></menu-item>
+    </template>
+    </iron-selector>
+
+  </template>
+  <script>
+      Polymer({
+
+          is: 'menu-list',
+
+          properties: {
+
+              menus: Array,
+
+              filterBy: {
+                  type: String,
+                  value: 'all'
+              }
+
+          },
+          _menusEmpty: function (length) {
+              return !!length;
+          },
+          _itemSelected: function (evt) {
+              this.fire('r-next', {});
+
+          },
+          getSelected: function () {
+              return this.$.selector.selectedItem;
+          },
+          _computeFilter: function (filterBy) {
+              if (filterBy) {
+
+                  // If filterBy is 'all', return a filter that always returns
+                  // the menu
+                  if (filterBy === 'all') {
+                      return function () {
+                          return true;
+                      };
+                  }
+
+                  // Handle 'completed', or its inverse, 'active'
+                  var ifComplete = (filterBy === 'completed');
+                  return function (item) {
+                      return item.isComplete === ifComplete;
+                  };
+              }
+          }
+
+      });
+  </script>
+</dom-module>

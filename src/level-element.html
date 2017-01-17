@@ -1,0 +1,86 @@
+<link rel="import" href="../bower_components/polymer/polymer.html">
+
+
+<link rel="import" href="menu-list/menu-list.html">
+<link rel="import" href="menu-input/menu-input.html">
+
+<dom-module id="level-element">
+
+    <template>
+
+        <style>
+            :host{
+                display: inline-block;
+            }
+        </style>
+
+        <h4>Menu Heading, Navigator, Index</h4>
+
+        <menu-list menus="{{menu}}"
+                   id="list"
+                   on-r-next="_renderNext"
+                   filter-by="{{route}}"
+                   on-delete-menu="deleteMenu">
+        </menu-list>
+
+        <menu-input on-add-menu="addMenu"></menu-input>
+
+
+
+        <!--<button on-tap="_add_menu_item">+ add menu item</button>-->
+
+
+    </template>
+    <script>
+        Polymer({
+            is: 'level-element',
+            properties: {
+                menu: {
+                    type: Array
+                }
+            },
+            ready: function () {
+                //console.info('Level Ready');
+                //console.info(this.menu);
+                //console.info(this.$.list.getSelected());
+
+            },
+            _add_menu_item: function () {
+                //this.$.menuitem1.appendChild(document.createElement('menu-element'));
+            },
+            addMenu: function (e) {
+
+                //console.info("Add Menu item");
+                //console.info(e.detail);
+                //console.log(this.menu);
+
+
+                this.push('menu', {
+                    description: e.detail.value,
+                    menus: []
+                });
+
+
+            },
+            _renderNext: function (e) {
+                var selection = this.$.list.getSelected();
+                //console.info(selection);
+                if (selection) {
+                    this.fire(
+                        'add-next', {
+                            selection: selection
+                        }
+                        );
+                }
+                //e.stopPropagation();
+
+            },
+
+            deleteMenu: function (e) {
+                this.arrayDelete('menu', e.detail.menu);
+            }
+        })
+
+
+    </script>
+</dom-module>

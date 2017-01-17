@@ -1,0 +1,159 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/paper-input/paper-input.html">
+<link rel="import" href="../../bower_components/paper-checkbox/paper-checkbox.html">
+<link rel="import" href="../../bower_components/paper-icon-button/paper-icon-button.html">
+<link rel="import" href="../../bower_components/iron-flex-layout/classes/iron-flex-layout.html">
+<link rel="import" href="../../bower_components/paper-material/paper-material.html">
+
+
+<dom-module id="menu-item">
+
+  <template>
+
+    <style>
+      :host {
+        display: block;
+        box-sizing: border-box;
+        min-height: 50px;
+      }
+
+      .row {
+        position: relative;
+        padding: 16px 16px 16px 22px;
+      }
+
+      paper-checkbox {
+        /* Checkbox has 8px of extra space on top so have to tweak it to center */
+        margin-top: -4px;
+        margin-right: 20px;
+      }
+
+      paper-checkbox[checked] + .label {
+        color: #9E9E9E;
+        text-decoration: line-through;
+      }
+
+      paper-input {
+        margin-top: -4px;
+        --paper-input-container-input: {
+          font-family: 'Roboto Slab';
+          font-size: 20px;
+          text-overflow: ellipsis;
+        };
+        --paper-input-container-underline: {
+          background: transparent;
+        };
+      }
+
+      .btn-cancel {
+        opacity: 0;
+        /* Same as paper-material shadow */
+        /*https://github.com/PolymerElements/paper-styles/blob/master/shadow.html#L17*/
+        transition: opacity 0.28s;
+        /* Odd hack to fix cropped paper-ripple focus state */
+        /* https://github.com/PolymerElements/paper-icon-button/issues/33 */
+        font-size: 15px;
+      }
+
+      :host:hover .btn-cancel,
+      :host([active]) .btn-cancel {
+        opacity: 1;
+      }
+    </style>
+
+    <paper-material elevation="[[_computeElevation(active)]]"
+                    class="row layout horizontal center">
+
+      <!-- Note the use of $= for aria-labelledby. This is because there's
+      no corresponding js property so we need to write a literal attribute
+      value, which is what $= does. -->
+      <paper-checkbox id="checkbox"
+                      checked="{{menu.isComplete}}"
+                      aria-labelledby$="[[_computeLabelId(menu.uid)]]"></paper-checkbox>
+
+      <paper-input id="[[_computeLabelId(menu.uid)]]"
+                   class="flex"
+                   value="{{menu.description}}"
+                   no-label-float
+                   on-keypress="_checkConfirmation"></paper-input>
+
+      <paper-icon-button icon="my-icons:delete"
+                         class="btn-cancel"
+                         aria-label="Delete Menu"
+                         tabindex="0"
+                         on-tap="_onDelete">
+      </paper-icon-button>
+
+
+
+
+    </paper-material>
+
+  </template>
+  <script>
+    Polymer({
+
+      is: 'menu-item',
+
+      properties: {
+
+        menu: Object,
+
+        // Used to show when one of the child elements has focus. Causes
+        // paper-material to elevate
+        active: {
+          type: Boolean,
+          value: false,
+          reflectToAttribute: true
+        }
+
+      },
+
+      attached: function() {
+        // Delegate focus events with useCapture to figure out if one of our
+        // child elements is being focused or if we're about to blur
+        // All of this fanciness is for the sake of the raised paper effect
+        this.addEventListener('focus', this._activate.bind(this), true);
+        this.addEventListener('blur', this._deactivate.bind(this), true);
+        this.addEventListener('mouseenter', this._activate.bind(this));
+        this.addEventListener('mouseleave', this._deactivate.bind(this));
+      },
+
+      detached: function() {
+        this.removeEventListener('focus', this._activate.bind(this), true);
+        this.removeEventListener('blur', this._deactivate.bind(this), true);
+        this.removeEventListener('mouseenter', this._activate.bind(this));
+        this.removeEventListener('mouseleave', this._deactivate.bind(this));
+      },
+
+      _activate: function() {
+        this.active = true;
+      },
+
+      _deactivate: function() {
+        this.active = false;
+      },
+
+      _computeElevation: function(active) {
+        return active ? 2 : 0;
+      },
+
+      _computeLabelId: function(uid) {
+        return 'menuItemLabel-' + uid;
+      },
+
+      // If enter was pressed, unfocus the text input
+      _checkConfirmation: function(e) {
+        if (e.keyCode === 13) {
+          e.preventDefault();
+          e.target.blur();
+        }
+      },
+
+      _onDelete: function() {
+        this.fire('delete-menu', {menu: this.menu});
+      }
+
+    });
+  </script>
+</dom-module>
